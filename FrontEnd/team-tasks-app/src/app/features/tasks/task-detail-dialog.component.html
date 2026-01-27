@@ -1,0 +1,76 @@
+<h2 mat-dialog-title>Task Details</h2>
+<mat-dialog-content>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else if (task) {
+    <div class="task-details">
+      <div class="detail-row">
+        <label>Title:</label>
+        <span>{{ task.title }}</span>
+      </div>
+      <div class="detail-row">
+        <label>Project:</label>
+        <span>{{ task.projectName }}</span>
+      </div>
+      <div class="detail-row">
+        <label>Description:</label>
+        <span>{{ task.description || 'No description' }}</span>
+      </div>
+      <div class="detail-row">
+        <label>Assigned To:</label>
+        <span>{{ task.assigneeName || 'Unassigned' }}</span>
+      </div>
+      <div class="detail-row">
+        <label>Current Status:</label>
+        <span [style]="task.status | statusBadge">{{ task.status }}</span>
+      </div>
+      <div class="detail-row">
+        <label>Priority:</label>
+        <span [style]="task.priority | statusBadge">{{ task.priority }}</span>
+      </div>
+      <div class="detail-row">
+        <label>Complexity:</label>
+        <span>{{ task.estimatedComplexity }} / 5</span>
+      </div>
+      <div class="detail-row">
+        <label>Due Date:</label>
+        <span>{{ task.dueDate ? (task.dueDate | date:'mediumDate') : 'Not set' }}</span>
+      </div>
+      <div class="detail-row">
+        <label>Created:</label>
+        <span>{{ task.createdAt | date:'medium' }}</span>
+      </div>
+
+      <hr>
+
+      <h3>Update Status</h3>
+      <div class="update-form">
+        <mat-form-field appearance="outline">
+          <mat-label>New Status</mat-label>
+          <mat-select [(ngModel)]="newStatus">
+            @for (status of statuses; track status) {
+              <mat-option [value]="status">{{ status }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Priority</mat-label>
+          <mat-select [(ngModel)]="newPriority">
+            @for (priority of priorities; track priority) {
+              <mat-option [value]="priority">{{ priority }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+  }
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="updateTask()" [disabled]="updating">
+    {{ updating ? 'Updating...' : 'Update' }}
+  </button>
+</mat-dialog-actions>

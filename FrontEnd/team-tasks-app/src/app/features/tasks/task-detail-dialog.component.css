@@ -1,0 +1,45 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.task-details {
+  min-width: 400px;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 12px;
+}
+
+.detail-row label {
+  font-weight: 500;
+  width: 120px;
+  color: #666;
+}
+
+.detail-row span {
+  flex: 1;
+}
+
+hr {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
+}
+
+h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.update-form {
+  display: flex;
+  gap: 16px;
+}
+
+.update-form mat-form-field {
+  flex: 1;
+}

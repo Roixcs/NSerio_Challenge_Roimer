@@ -16,72 +16,8 @@ export interface TableColumn {
   selector: 'app-data-table',
   standalone: true,
   imports: [CommonModule, MatTableModule, MatSortModule, MatPaginatorModule],
-  template: `
-    <div class="table-container">
-      <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
-        @for (column of columns; track column.key) {
-          <ng-container [matColumnDef]="column.key">
-            <th mat-header-cell *matHeaderCellDef [mat-sort-header]="column.sortable ? column.key : ''">
-              {{ column.header }}
-            </th>
-            <td mat-cell *matCellDef="let row" [class]="getCellClass(column, row)">
-              @if (column.format) {
-                {{ column.format(row[column.key], row) }}
-              } @else {
-                {{ row[column.key] }}
-              }
-            </td>
-          </ng-container>
-        }
-
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-            [class.highlight-row]="highlightCondition && highlightCondition(row)"
-            [class.clickable-row]="rowClickable"
-            (click)="onRowClick(row)">
-        </tr>
-      </table>
-
-      @if (showPaginator) {
-        <mat-paginator
-          [length]="totalCount"
-          [pageSize]="pageSize"
-          [pageIndex]="pageIndex"
-          [pageSizeOptions]="pageSizeOptions"
-          (page)="onPageChange($event)"
-          showFirstLastButtons>
-        </mat-paginator>
-      }
-    </div>
-  `,
-  styles: [`
-    .table-container {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-    }
-
-    .highlight-row {
-      background-color: #ffebee !important;
-    }
-
-    .clickable-row {
-      cursor: pointer;
-    }
-
-    .clickable-row:hover {
-      background-color: #f5f5f5;
-    }
-
-    .badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-  `]
+  templateUrl: './data-table.component.html',
+  styleUrl: './data-table.component.css'
 })
 export class DataTableComponent implements OnInit, OnChanges {
   @Input() data: any[] = [];
