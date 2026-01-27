@@ -3,6 +3,7 @@ using TeamTasks.Application.Interfaces;
 
 namespace TeamTaskAPI.Controllers
 {
+
     [ApiController]
     [Route("api/[controller]")]
     public class DevelopersController : ControllerBase
@@ -20,10 +21,10 @@ namespace TeamTaskAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetActiveDevelopers()
         {
-            var developers = await _developerService.GetActiveDevelopersAsync();
-            return Ok(developers);
+            var result = await _developerService.GetActiveDevelopersAsync();
+            if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
         }
     }
 
 }
-

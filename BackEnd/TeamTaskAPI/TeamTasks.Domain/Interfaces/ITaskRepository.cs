@@ -13,5 +13,9 @@ namespace TeamTasks.Domain.Interfaces
             TaskStatus? status = null,
             int? assigneeId = null);
         Task<TaskItem?> GetByIdWithDetailsAsync(int taskId);
+        
+        // SP Methods
+        Task<TaskItem> AddWithSPAsync(TaskItem task);
+        Task<TaskItem?> UpdateStatusWithSPAsync(int taskId, string status, string? priority = null, int? complexity = null);
     }
 }

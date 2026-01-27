@@ -5,6 +5,7 @@ using TeamTasks.Domain.Entities;
 using TeamTasks.Domain.Enums;
 using TeamTasks.Domain.Interfaces;
 using TaskStatus = TeamTasks.Domain.Enums.TaskStatus;
+using Microsoft.Data.SqlClient;
 
 namespace TeamTasks.Application.Services
 {
@@ -24,7 +25,7 @@ namespace TeamTasks.Application.Services
             _developerRepository = developerRepository;
         }
 
-        public async Task<PaginatedResult<TaskDto>> GetTasksByProjectAsync( int projectId, int page, int pageSize, string? status = null, int? assigneeId = null)
+        public async Task<Result<PaginatedResult<TaskDto>>> GetTasksByProjectAsync(int projectId, int page, int pageSize, string? status = null, int? assigneeId = null)
         {
             TaskStatus? taskStatus = null;
             if (!string.IsNullOrEmpty(status) && Enum.TryParse<TaskStatus>(status, true, out var parsedStatus))
@@ -49,93 +50,82 @@ namespace TeamTasks.Application.Services
                 t.CreatedAt
             ));
 
-            return new PaginatedResult<TaskDto>(dtos, totalCount, page, pageSize);
+            return Result<PaginatedResult<TaskDto>>.Success(new PaginatedResult<TaskDto>(dtos, totalCount, page, pageSize));
         }
 
-        public async Task<TaskDetailDto?> GetTaskByIdAsync(int taskId)
+        public async Task<Result<TaskDetailDto>> GetTaskByIdAsync(int taskId)
         {
             var task = await _taskRepository.GetByIdWithDetailsAsync(taskId);
 
             if (task == null)
-                return null;
+                return Result<TaskDetailDto>.Failure($"Task with ID {taskId} not found.");
 
-            return MapToDetailDto(task);
+            return Result<TaskDetailDto>.Success(MapToDetailDto(task));
         }
 
-        public async Task<TaskDetailDto> CreateTaskAsync(CreateTaskDto dto)
+        public async Task<Result<TaskDetailDto>> CreateTaskAsync(CreateTaskDto dto)
         {
-            // Validate
-            var validationResult = await TaskValidator.ValidateCreateAsync(dto, _projectRepository, _developerRepository);
-            if (!validationResult.IsValid)
+            try
             {
-                throw new ValidationException(validationResult.Errors);
+                // Parse enums
+                if (!Enum.TryParse<TaskStatus>(dto.Status, true, out var status))
+                    return Result<TaskDetailDto>.Failure("Invalid Status.");
+
+                if (!Enum.TryParse<TaskPriority>(dto.Priority, true, out var priority))
+                    return Result<TaskDetailDto>.Failure("Invalid Priority.");
+
+                // Create entity (basic mapping)
+                var task = new TaskItem
+                {
+                    ProjectId = dto.ProjectId,
+                    Title = dto.Title.Trim(),
+                    Description = dto.Description?.Trim(),
+                    AssigneeId = dto.AssigneeId,
+                    Status = status,
+                    Priority = priority,
+                    EstimatedComplexity = dto.EstimatedComplexity,
+                    DueDate = dto.DueDate,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                // Use SP for insertion + business validation
+                // Explicitly relying on SP for ProjectId/AssigneeId validation
+                var createdTask = await _taskRepository.AddWithSPAsync(task);
+
+                return Result<TaskDetailDto>.Success(MapToDetailDto(createdTask));
             }
-
-            // Parse enums
-            var status = Enum.Parse<TaskStatus>(dto.Status, true);
-            var priority = Enum.Parse<TaskPriority>(dto.Priority, true);
-
-            // Create entity
-            var task = new TaskItem
+            catch (SqlException ex)
             {
-                ProjectId = dto.ProjectId,
-                Title = dto.Title.Trim(),
-                Description = dto.Description?.Trim(),
-                AssigneeId = dto.AssigneeId,
-                Status = status,
-                Priority = priority,
-                EstimatedComplexity = dto.EstimatedComplexity,
-                DueDate = dto.DueDate,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            await _taskRepository.AddAsync(task);
-
-            // Reload with details
-            var created = await _taskRepository.GetByIdWithDetailsAsync(task.TaskId);
-            return MapToDetailDto(created!);
+                // Capture SP validation errors (RAISERROR from SP)
+                return Result<TaskDetailDto>.Failure(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // General error fallback
+                return Result<TaskDetailDto>.Failure($"An error occurred: {ex.Message}");
+            }
         }
 
-        public async Task<TaskDetailDto?> UpdateTaskStatusAsync(int taskId, UpdateTaskStatusDto dto)
+        public async Task<Result<TaskDetailDto>> UpdateTaskStatusAsync(int taskId, UpdateTaskStatusDto dto)
         {
-            var task = await _taskRepository.GetByIdWithDetailsAsync(taskId);
-
-            if (task == null)
-                return null;
-
-            // Validate and parse status
-            if (!Enum.TryParse<TaskStatus>(dto.Status, true, out var newStatus))
+            try
             {
-                throw new ValidationException(new[] { "Invalid status value. Valid values: ToDo, InProgress, Blocked, Completed" });
+                // Use SP for updates
+                var updatedTask = await _taskRepository.UpdateStatusWithSPAsync(taskId, dto.Status, dto.Priority, dto.EstimatedComplexity);
+
+                if (updatedTask == null)
+                    return Result<TaskDetailDto>.Failure($"Task with ID {taskId} not found.");
+
+                return Result<TaskDetailDto>.Success(MapToDetailDto(updatedTask));
             }
-
-            task.Status = newStatus;
-
-            // Set completion date if completing
-            if (newStatus == TaskStatus.Completed && task.CompletionDate == null)
+            catch (SqlException ex)
             {
-                task.CompletionDate = DateTime.UtcNow;
+                return Result<TaskDetailDto>.Failure(ex.Message);
             }
-            else if (newStatus != TaskStatus.Completed)
+            catch (Exception ex)
             {
-                task.CompletionDate = null;
+                return Result<TaskDetailDto>.Failure(ex.Message);
             }
-
-            // Optional: update priority
-            if (!string.IsNullOrEmpty(dto.Priority) && Enum.TryParse<TaskPriority>(dto.Priority, true, out var newPriority))
-            {
-                task.Priority = newPriority;
-            }
-
-            // Optional: update complexity
-            if (dto.EstimatedComplexity.HasValue && dto.EstimatedComplexity >= 1 && dto.EstimatedComplexity <= 5)
-            {
-                task.EstimatedComplexity = dto.EstimatedComplexity.Value;
-            }
-
-            await _taskRepository.UpdateAsync(task);
-
-            return MapToDetailDto(task);
         }
 
         private static TaskDetailDto MapToDetailDto(TaskItem task)

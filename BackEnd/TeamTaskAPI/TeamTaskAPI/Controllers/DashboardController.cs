@@ -20,8 +20,9 @@ namespace TeamTaskAPI.Controllers
         [HttpGet("developer-workload")]
         public async Task<IActionResult> GetDeveloperWorkload()
         {
-            var workload = await _dashboardService.GetDeveloperWorkloadAsync();
-            return Ok(workload);
+            var result = await _dashboardService.GetDeveloperWorkloadAsync();
+            if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -30,8 +31,9 @@ namespace TeamTaskAPI.Controllers
         [HttpGet("project-health")]
         public async Task<IActionResult> GetProjectHealth()
         {
-            var health = await _dashboardService.GetProjectHealthAsync();
-            return Ok(health);
+            var result = await _dashboardService.GetProjectHealthAsync();
+            if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -40,8 +42,9 @@ namespace TeamTaskAPI.Controllers
         [HttpGet("developer-delay-risk")]
         public async Task<IActionResult> GetDeveloperDelayRisk()
         {
-            var risk = await _dashboardService.GetDeveloperDelayRiskAsync();
-            return Ok(risk);
+            var result = await _dashboardService.GetDeveloperDelayRiskAsync();
+            if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
         }
     }
 

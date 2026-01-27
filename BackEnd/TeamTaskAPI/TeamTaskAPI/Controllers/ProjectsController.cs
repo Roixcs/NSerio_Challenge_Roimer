@@ -22,8 +22,9 @@ namespace TeamTaskAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetProjects()
         {
-            var projects = await _projectService.GetProjectsWithStatsAsync();
-            return Ok(projects);
+            var result = await _projectService.GetProjectsWithStatsAsync();
+            if (!result.IsSuccess) return BadRequest(result);
+            return Ok(result);
         }
 
 
@@ -36,6 +37,9 @@ namespace TeamTaskAPI.Controllers
             if (pageSize > 50) pageSize = 50;
 
             var result = await _taskService.GetTasksByProjectAsync(id, page, pageSize, status, assigneeId);
+            
+            if (!result.IsSuccess) return BadRequest(result);
+            
             return Ok(result);
         }
     }

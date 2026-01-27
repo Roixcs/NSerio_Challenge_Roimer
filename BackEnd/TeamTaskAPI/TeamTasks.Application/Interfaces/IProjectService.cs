@@ -1,10 +1,11 @@
 using TeamTasks.Application.Dtos;
+using TeamTasks.Domain.Entities;
 
 namespace TeamTasks.Application.Interfaces
 {
     public interface IProjectService
     {
-        Task<IEnumerable<ProjectDto>> GetProjectsWithStatsAsync();
-        Task<ProjectDetailDto?> GetProjectByIdAsync(int projectId);
+        Task<Result<IEnumerable<ProjectDto>>> GetProjectsWithStatsAsync();
+        Task<Result<ProjectDetailDto>> GetProjectByIdAsync(int projectId);
     }
 }

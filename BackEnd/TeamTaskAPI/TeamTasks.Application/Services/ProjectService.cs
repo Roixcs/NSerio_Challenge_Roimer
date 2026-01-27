@@ -1,6 +1,7 @@
 using TeamTasks.Application.Dtos;
 using TeamTasks.Application.Interfaces;
 using TeamTasks.Domain.Interfaces;
+using TeamTasks.Domain.Entities;
 
 namespace TeamTasks.Application.Services
 {
@@ -17,11 +18,11 @@ namespace TeamTasks.Application.Services
             _dashboardRepository = dashboardRepository;
         }
 
-        public async Task<IEnumerable<ProjectDto>> GetProjectsWithStatsAsync()
+        public async Task<Result<IEnumerable<ProjectDto>>> GetProjectsWithStatsAsync()
         {
             var projectHealth = await _dashboardRepository.GetProjectHealthAsync();
 
-            return projectHealth.Select(p => new ProjectDto(
+            var dtos = projectHealth.Select(p => new ProjectDto(
                 p.ProjectId,
                 p.ProjectName,
                 p.ClientName,
@@ -30,16 +31,18 @@ namespace TeamTasks.Application.Services
                 p.OpenTasks,
                 p.CompletedTasks
             ));
+
+            return Result<IEnumerable<ProjectDto>>.Success(dtos);
         }
 
-        public async Task<ProjectDetailDto?> GetProjectByIdAsync(int projectId)
+        public async Task<Result<ProjectDetailDto>> GetProjectByIdAsync(int projectId)
         {
             var project = await _projectRepository.GetByIdAsync(projectId);
 
             if (project == null)
-                return null;
+                return Result<ProjectDetailDto>.Failure($"Project with ID {projectId} not found.");
 
-            return new ProjectDetailDto(
+            var dto = new ProjectDetailDto(
                 project.ProjectId,
                 project.Name,
                 project.ClientName,
@@ -47,6 +50,8 @@ namespace TeamTasks.Application.Services
                 project.EndDate,
                 project.Status.ToString()
             );
+
+            return Result<ProjectDetailDto>.Success(dto);
         }
     }
 }

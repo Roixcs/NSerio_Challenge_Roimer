@@ -21,12 +21,13 @@ namespace TeamTaskAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTask(int id)
         {
-            var task = await _taskService.GetTaskByIdAsync(id);
+            var result = await _taskService.GetTaskByIdAsync(id);
 
-            if (task == null)
-                return NotFound(new { message = $"Task with ID {id} not found." });
+            // Return full Result object for consistency
+            if (!result.IsSuccess)
+                return NotFound(result);
 
-            return Ok(task);
+            return Ok(result);
         }
 
         /// <summary>
@@ -35,8 +36,13 @@ namespace TeamTaskAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto dto)
         {
-            var task = await _taskService.CreateTaskAsync(dto);
-            return CreatedAtAction(nameof(GetTask), new { id = task.TaskId }, task);
+            var result = await _taskService.CreateTaskAsync(dto);
+            
+            // Return full Result object
+            if (!result.IsSuccess)
+                return BadRequest(result);
+
+            return CreatedAtAction(nameof(GetTask), new { id = result.Data!.TaskId }, result);
         }
 
         /// <summary>
@@ -45,12 +51,13 @@ namespace TeamTaskAPI.Controllers
         [HttpPut("{id}/status")]
         public async Task<IActionResult> UpdateTaskStatus(int id, [FromBody] UpdateTaskStatusDto dto)
         {
-            var task = await _taskService.UpdateTaskStatusAsync(id, dto);
+            var result = await _taskService.UpdateTaskStatusAsync(id, dto);
 
-            if (task == null)
-                return NotFound(new { message = $"Task with ID {id} not found." });
+            // Return full Result object
+            if (!result.IsSuccess)
+                return BadRequest(result);
 
-            return Ok(task);
+            return Ok(result);
         }
     }
 }

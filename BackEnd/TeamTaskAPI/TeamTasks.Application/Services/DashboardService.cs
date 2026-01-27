@@ -1,5 +1,6 @@
 using TeamTasks.Application.Interfaces;
 using TeamTasks.Domain.Interfaces;
+using TeamTasks.Domain.Entities;
 
 namespace TeamTasks.Application.Services
 {
@@ -12,19 +13,22 @@ namespace TeamTasks.Application.Services
             _dashboardRepository = dashboardRepository;
         }
 
-        public async Task<IEnumerable<DeveloperWorkloadDto>> GetDeveloperWorkloadAsync()
+        public async Task<Result<IEnumerable<DeveloperWorkloadDto>>> GetDeveloperWorkloadAsync()
         {
-            return await _dashboardRepository.GetDeveloperWorkloadAsync();
+            var result = await _dashboardRepository.GetDeveloperWorkloadAsync();
+            return Result<IEnumerable<DeveloperWorkloadDto>>.Success(result);
         }
 
-        public async Task<IEnumerable<ProjectHealthDto>> GetProjectHealthAsync()
+        public async Task<Result<IEnumerable<ProjectHealthDto>>> GetProjectHealthAsync()
         {
-            return await _dashboardRepository.GetProjectHealthAsync();
+            var result = await _dashboardRepository.GetProjectHealthAsync();
+            return Result<IEnumerable<ProjectHealthDto>>.Success(result);
         }
 
-        public async Task<IEnumerable<DeveloperDelayRiskDto>> GetDeveloperDelayRiskAsync()
+        public async Task<Result<IEnumerable<DeveloperDelayRiskDto>>> GetDeveloperDelayRiskAsync()
         {
-            return await _dashboardRepository.GetDeveloperDelayRiskAsync();
+            var result = await _dashboardRepository.GetDeveloperDelayRiskAsync();
+            return Result<IEnumerable<DeveloperDelayRiskDto>>.Success(result);
         }
     }
 }
