@@ -137,6 +137,8 @@ NSerio_Challenge_Roimer/
 
 4. **Stored Procedures**: `sp_InsertTask` incluye validaciones de negocio (existencia de ProjectId, AssigneeId activo, campos requeridos) y retorna mensajes detallados en caso de error. `sp_UpdateTaskStatus` permite actualizar status, priority y complexity.
 
+**Nota**: Opté por usar IDENTITY para claves primarias por su simplicidad y performance en este escenario de prueba. Se podría usar GUID/ULID.
+
 ### Backend
 
 5. **Hibrido EF Core + Dapper**: EF Core se usa para operaciones CRUD con entidades y relaciones. Dapper se usa para consultas complejas (vistas SQL del Dashboard) y ejecucion de stored procedures, optimizando rendimiento en lecturas.
