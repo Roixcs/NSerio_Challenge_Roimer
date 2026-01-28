@@ -1,0 +1,75 @@
+.dashboard-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.dashboard-card {
+  min-height: 300px;
+  overflow: hidden;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+table {
+  width: 100%;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Warning row: open tasks > completed */
+.warning-row {
+  background-color: #fff8e1 !important;
+  border-left: 3px solid #ffa000;
+}
+
+.warning-row:hover {
+  background-color: #fff3c4 !important;
+}
+
+/* Clickable project links */
+.project-link {
+  color: #1565c0;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.project-link:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}
+
+@media (max-width: 960px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

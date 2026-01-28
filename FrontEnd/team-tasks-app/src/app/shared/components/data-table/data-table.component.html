@@ -1,0 +1,36 @@
+<div class="table-container">
+  <table mat-table [dataSource]="dataSource" matSort (matSortChange)="onSortChange($event)">
+    @for (column of columns; track column.key) {
+      <ng-container [matColumnDef]="column.key">
+        <th mat-header-cell *matHeaderCellDef [mat-sort-header]="column.sortable ? column.key : ''">
+          {{ column.header }}
+        </th>
+        <td mat-cell *matCellDef="let row" [class]="getCellClass(column, row)">
+          @if (column.format) {
+            {{ column.format(row[column.key], row) }}
+          } @else {
+            {{ row[column.key] }}
+          }
+        </td>
+      </ng-container>
+    }
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+        [class.highlight-row]="highlightCondition && highlightCondition(row)"
+        [class.clickable-row]="rowClickable"
+        (click)="onRowClick(row)">
+    </tr>
+  </table>
+
+  @if (showPaginator) {
+    <mat-paginator
+      [length]="totalCount"
+      [pageSize]="pageSize"
+      [pageIndex]="pageIndex"
+      [pageSizeOptions]="pageSizeOptions"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  }
+</div>

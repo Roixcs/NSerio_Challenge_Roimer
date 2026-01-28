@@ -1,0 +1,100 @@
+/* Global Styles - Team Tasks Dashboard */
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f0f2f5;
+}
+
+/* ===== Global Material Table Styles ===== */
+
+/* Header row */
+.mat-mdc-header-row {
+  background-color: #37474f !important;
+}
+
+.mat-mdc-header-cell {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-bottom: none !important;
+}
+
+/* Sort arrow color override for dark header */
+.mat-sort-header-arrow {
+  color: #fff !important;
+}
+
+/* Body rows - zebra striping */
+.mat-mdc-row {
+  transition: background-color 0.15s ease;
+
+  &:nth-child(even) {
+    background-color: #f4f6f9;
+  }
+
+  &:hover {
+    background-color: #dce6f7 !important;
+  }
+}
+
+.mat-mdc-cell {
+  font-size: 13.5px !important;
+  color: #333 !important;
+  border-bottom: 1px solid #e9ecef !important;
+  padding: 12px 16px !important;
+}
+
+/* ===== Material Card enhancements ===== */
+.mat-mdc-card {
+  border-radius: 12px !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.mat-mdc-card-header {
+  padding: 20px 24px 12px !important;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mat-mdc-card-title {
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  color: #1a1a2e !important;
+}
+
+.mat-mdc-card-subtitle {
+  font-size: 13px !important;
+  color: #888 !important;
+  margin-top: 2px !important;
+}
+
+/* ===== Paginator ===== */
+.mat-mdc-paginator {
+  border-top: 1px solid #e9ecef;
+  background-color: #fafbfc !important;
+}
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bbb;
+  border-radius: 4px;
+
+  &:hover {
+    background: #999;
+  }
+}
