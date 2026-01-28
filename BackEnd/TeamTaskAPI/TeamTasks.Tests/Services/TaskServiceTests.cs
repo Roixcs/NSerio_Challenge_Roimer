@@ -30,7 +30,7 @@ namespace TeamTasks.Tests.Services
             _mockValidator.Setup(v => v.ValidateAsync(It.IsAny<CreateTaskDto>(), It.IsAny<CancellationToken>()))
                           .ReturnsAsync(new FluentValidation.Results.ValidationResult());
 
-            _taskService = new TaskService(_mockTaskRepository.Object, _mockProjectRepository.Object, _mockDeveloperRepository.Object, _mockValidator.Object);
+            _taskService = new TaskService(_mockTaskRepository.Object, _mockValidator.Object);
         }
 
         /// <summary>
