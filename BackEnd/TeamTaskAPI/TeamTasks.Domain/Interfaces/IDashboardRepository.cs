@@ -8,7 +8,7 @@ namespace TeamTasks.Domain.Interfaces
         Task<IEnumerable<TaskDueSoonDto>> GetTasksDueSoonAsync();
     }
 
-    // DTOs for dashboard queries (defined here as they're tightly coupled to the SQL views)
+    // DTOs for dashboard queries
     public record DeveloperWorkloadDto(
         int DeveloperId,
         string DeveloperName,

@@ -1,28 +1,22 @@
+using Microsoft.Data.SqlClient;
 using TeamTasks.Application.Dtos;
 using TeamTasks.Application.Interfaces;
-using TeamTasks.Application.Validators;
 using TeamTasks.Domain.Entities;
 using TeamTasks.Domain.Enums;
 using TeamTasks.Domain.Interfaces;
 using TaskStatus = TeamTasks.Domain.Enums.TaskStatus;
-using Microsoft.Data.SqlClient;
 
 namespace TeamTasks.Application.Services
 {
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
-        private readonly IProjectRepository _projectRepository;
-        private readonly IDeveloperRepository _developerRepository;
+        private readonly FluentValidation.IValidator<CreateTaskDto> _createTaskValidator;
 
-        public TaskService(
-            ITaskRepository taskRepository,
-            IProjectRepository projectRepository,
-            IDeveloperRepository developerRepository)
+        public TaskService(ITaskRepository taskRepository, FluentValidation.IValidator<CreateTaskDto> createTaskValidator)
         {
             _taskRepository = taskRepository;
-            _projectRepository = projectRepository;
-            _developerRepository = developerRepository;
+            _createTaskValidator = createTaskValidator;
         }
 
         public async Task<Result<PaginatedResult<TaskDto>>> GetTasksByProjectAsync(int projectId, int page, int pageSize, string? status = null, int? assigneeId = null)
@@ -67,6 +61,11 @@ namespace TeamTasks.Application.Services
         {
             try
             {
+                // Fluent Validation
+                var validationResult = await _createTaskValidator.ValidateAsync(dto);
+                if (!validationResult.IsValid)
+                    throw new FluentValidation.ValidationException(validationResult.Errors);
+
                 // Parse enums
                 if (!Enum.TryParse<TaskStatus>(dto.Status, true, out var status))
                     return Result<TaskDetailDto>.Failure("Invalid Status.");
@@ -94,14 +93,18 @@ namespace TeamTasks.Application.Services
 
                 return Result<TaskDetailDto>.Success(MapToDetailDto(createdTask));
             }
-            catch (SqlException ex)
+            catch (Microsoft.Data.SqlClient.SqlException ex)
             {
-                // Capture SP validation errors (RAISERROR from SP)
+                // Capture SP validation errors
                 return Result<TaskDetailDto>.Failure(ex.Message);
+            }
+            catch (FluentValidation.ValidationException ex)
+            {
+                var errorMessages = string.Join("; ", ex.Errors.Select(e => e.ErrorMessage));
+                return Result<TaskDetailDto>.Failure(errorMessages);
             }
             catch (Exception ex)
             {
-                // General error fallback
                 return Result<TaskDetailDto>.Failure($"An error occurred: {ex.Message}");
             }
         }

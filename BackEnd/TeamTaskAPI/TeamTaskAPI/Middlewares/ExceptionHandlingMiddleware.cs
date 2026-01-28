@@ -1,6 +1,5 @@
 using System.Net;
 using System.Text.Json;
-using TeamTasks.Application.Validators;
 
 namespace TeamTaskAPI.Middlewares
 {
@@ -21,7 +20,11 @@ namespace TeamTaskAPI.Middlewares
             {
                 await _next(context);
             }
-            catch (ValidationException ex)
+            catch (FluentValidation.ValidationException ex)
+            {
+                await HandleFluentValidationExceptionAsync(context, ex);
+            }
+            catch (TeamTasks.Application.Validators.ValidationException ex)
             {
                 await HandleValidationExceptionAsync(context, ex);
             }
@@ -32,16 +35,40 @@ namespace TeamTaskAPI.Middlewares
             }
         }
 
-        private static async Task HandleValidationExceptionAsync(HttpContext context, ValidationException exception)
+        private static async Task HandleFluentValidationExceptionAsync(HttpContext context, FluentValidation.ValidationException exception)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
 
+            var errors = string.Join("; ", exception.Errors.Select(e => e.ErrorMessage));
+
             var response = new
             {
-                status = 400,
-                message = "Validation failed",
-                errors = exception.Errors
+                isSuccess = false,
+                value = (object?)null,
+                errorMessage = $"Validation failed: {errors}"
+            };
+
+            var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            await context.Response.WriteAsync(json);
+        }
+
+        private static async Task HandleValidationExceptionAsync(HttpContext context, TeamTasks.Application.Validators.ValidationException exception)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+
+            var errors = string.Join("; ", exception.Errors);
+
+            var response = new
+            {
+                isSuccess = false,
+                value = (object?)null,
+                errorMessage = $"Validation failed: {errors}"
             };
 
             var json = JsonSerializer.Serialize(response, new JsonSerializerOptions
@@ -59,9 +86,10 @@ namespace TeamTaskAPI.Middlewares
 
             var response = new
             {
-                status = 500,
-                message = "An internal server error occurred",
-                detail = exception.Message // In production, you might want to hide this
+                isSuccess = false,
+                value = (object?)null,
+                errorMessage = "An internal server error occurred"
+                // detail = exception.Message // Hidden for production safety, implied by requirement.
             };
 
             var json = JsonSerializer.Serialize(response, new JsonSerializerOptions

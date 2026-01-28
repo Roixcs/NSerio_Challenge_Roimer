@@ -10,9 +10,7 @@ namespace TeamTasks.Application.Services
         private readonly IProjectRepository _projectRepository;
         private readonly IDashboardRepository _dashboardRepository;
 
-        public ProjectService(
-            IProjectRepository projectRepository,
-            IDashboardRepository dashboardRepository)
+        public ProjectService(IProjectRepository projectRepository, IDashboardRepository dashboardRepository)
         {
             _projectRepository = projectRepository;
             _dashboardRepository = dashboardRepository;

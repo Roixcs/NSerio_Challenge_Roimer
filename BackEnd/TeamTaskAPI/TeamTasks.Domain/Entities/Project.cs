@@ -12,7 +12,6 @@ namespace TeamTasks.Domain.Entities
         public ProjectStatus Status { get; set; } = ProjectStatus.Planned;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation property
         public ICollection<TaskItem> Tasks { get; set; } = new List<TaskItem>();
     }
 }

@@ -9,10 +9,9 @@ namespace TeamTasks.Domain.Entities
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation property
+
         public ICollection<TaskItem> AssignedTasks { get; set; } = new List<TaskItem>();
 
-        // Computed property
         public string FullName => $"{FirstName} {LastName}";
     }
 }

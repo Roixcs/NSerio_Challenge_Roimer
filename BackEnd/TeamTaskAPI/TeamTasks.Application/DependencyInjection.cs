@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using TeamTasks.Application.Interfaces;
 using TeamTasks.Application.Services;
+using FluentValidation;
+using System.Reflection;
 
 namespace TeamTasks.Application
 {
@@ -12,6 +14,8 @@ namespace TeamTasks.Application
             services.AddScoped<IProjectService, ProjectService>();
             services.AddScoped<ITaskService, TaskService>();
             services.AddScoped<IDashboardService, DashboardService>();
+
+            services.AddValidatorsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
 
             return services;
         }

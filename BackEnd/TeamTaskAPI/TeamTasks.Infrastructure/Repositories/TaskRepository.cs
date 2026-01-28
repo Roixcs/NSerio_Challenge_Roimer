@@ -25,9 +25,7 @@ namespace TeamTasks.Infrastructure.Repositories
             TaskStatus? status = null,
             int? assigneeId = null)
         {
-            var query = _dbSet
-                .Include(t => t.Assignee)
-                .Where(t => t.ProjectId == projectId);
+            var query = _dbSet.Include(t => t.Assignee).Where(t => t.ProjectId == projectId);
 
             if (status.HasValue)
                 query = query.Where(t => t.Status == status.Value);
@@ -35,17 +33,12 @@ namespace TeamTasks.Infrastructure.Repositories
             if (assigneeId.HasValue)
                 query = query.Where(t => t.AssigneeId == assigneeId.Value);
 
-            return await query
-                .OrderBy(t => t.DueDate)
-                .ThenBy(t => t.Priority)
-                .ToListAsync();
+            return await query.OrderBy(t => t.DueDate).ThenBy(t => t.Priority).ToListAsync();
         }
 
         public async Task<(IEnumerable<TaskItem> Items, int TotalCount)> GetByProjectIdPagedAsync(int projectId, int page, int pageSize, TaskStatus? status = null, int? assigneeId = null)
         {
-            var query = _dbSet
-                .Include(t => t.Assignee)
-                .Where(t => t.ProjectId == projectId);
+            var query = _dbSet.Include(t => t.Assignee).Where(t => t.ProjectId == projectId);
 
             if (status.HasValue)
                 query = query.Where(t => t.Status == status.Value);

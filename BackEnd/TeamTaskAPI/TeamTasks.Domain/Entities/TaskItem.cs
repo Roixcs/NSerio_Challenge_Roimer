@@ -17,7 +17,7 @@ namespace TeamTasks.Domain.Entities
         public DateTime? CompletionDate { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Navigation properties
+
         public Project Project { get; set; } = null!;
         public Developer? Assignee { get; set; }
     }

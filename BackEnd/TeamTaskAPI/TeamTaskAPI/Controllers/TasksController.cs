@@ -16,7 +16,7 @@ namespace TeamTaskAPI.Controllers
         }
 
         /// <summary>
-        /// Get a specific task by ID
+        /// Get task by ID
         /// </summary>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTask(int id)
@@ -30,9 +30,7 @@ namespace TeamTaskAPI.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Create a new task
-        /// </summary>
+
         [HttpPost]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskDto dto)
         {
