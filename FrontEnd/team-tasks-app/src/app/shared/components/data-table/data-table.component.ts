@@ -20,6 +20,7 @@ export interface TableColumn {
   styleUrl: './data-table.component.css'
 })
 export class DataTableComponent implements OnInit, OnChanges {
+  
   @Input() data: any[] = [];
   @Input() columns: TableColumn[] = [];
   @Input() showPaginator = false;
@@ -46,6 +47,7 @@ export class DataTableComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+
     if (changes['data']) {
       this.dataSource.data = this.data;
     }
